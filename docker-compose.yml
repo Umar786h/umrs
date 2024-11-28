@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend      # Build the backend container using the Dockerfile in ./backend
+    ports:
+      - "5000:5000"        # Expose backend on port 5000
+    volumes:
+      - ./backend:/app     # Mount the backend code inside the container
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/mernapp  # MongoDB URI for the backend
+    depends_on:
+      - mongo              # Wait for MongoDB to be ready before starting the backend
+
+  frontend:
+    build: ./backend/frontend  # Build the frontend container using the Dockerfile in ./backend/frontend
+    ports:
+      - "80:80"               # Expose frontend on port 80
+    volumes:
+      - ./backend/frontend:/app  # Mount the frontend code inside the container
+    depends_on:
+      - backend               # Wait for the backend to be ready before starting the frontend
+
+  mongo:
+    image: mongo:latest        # Use the official MongoDB image
+    ports:
+      - "27017:27017"          # Expose MongoDB on port 27017
+    volumes:
+      - mongo-data:/data/db    # Persistent storage for MongoDB data
+
+volumes:
+  mongo-data:
